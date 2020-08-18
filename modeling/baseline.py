@@ -128,6 +128,18 @@ class Baseline(nn.Module):
         elif model_name == 'resnet50_ibn_a':
             self.base = resnet50_ibn_a(last_stride)
 
+        #TT my changes
+        elif model_name == 'efficientnet-b0':
+          self.in_planes = 1280
+          self.base = EfficientNet.from_pretrained(model_name)
+        elif model_name == 'efficientnet-b1':
+          self.in_planes = 1280
+          self.base = EfficientNet.from_pretrained(model_name)
+        elif model_name == 'efficientnet-b2':
+          self.in_planes = 1408
+          self.base = EfficientNet.from_pretrained(model_name)
+        #TT end 
+
         if pretrain_choice == 'imagenet':
             self.base.load_param(model_path)
             print('Loading pretrained ImageNet model......')
