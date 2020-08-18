@@ -206,8 +206,8 @@ def do_train(
         global ITER
         if tb_logger:
           global TB_ITER
-          writer.add_scalar("avg_loss", engine.sate.metrics['avg_loss'],TB_ITER)
-          writer.add_scalar('avg_acc', engine.sate.metrics['avg_acc'],TB_ITER)
+          writer.add_scalar("avg_loss", engine.state.metrics['avg_loss'],TB_ITER)
+          writer.add_scalar('avg_acc', engine.state.metrics['avg_acc'],TB_ITER)
           TB_ITER+=1
 
         ITER += 1
