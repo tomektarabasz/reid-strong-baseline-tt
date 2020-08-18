@@ -11,6 +11,8 @@ import torch.nn as nn
 from ignite.engine import Engine, Events
 from ignite.handlers import ModelCheckpoint, Timer
 from ignite.metrics import RunningAverage
+import os
+from torch.utils.tensorboard import SummaryWriter
 
 from utils.reid_metric import R1_mAP
 
@@ -34,7 +36,7 @@ def create_summary_writer(model,data_loader,output_dir):
   output_folder = os.path.join(output_dir,'tb_logs',time_now)
   os.makedirs(output_folder,exist_ok=True)
 
-  writer = SummaryWritter(log_dir = output_folder)
+  writer = SummaryWriter(log_dir = output_folder)
 
   return writer
 
@@ -202,6 +204,12 @@ def do_train(
     @trainer.on(Events.ITERATION_COMPLETED)
     def log_training_loss(engine):
         global ITER
+        if tb_logger:
+          global TB_ITER
+          writer.add_scalar("avg_loss", engine.sate.metrics['avg_loss'],TB_ITER)
+          writer.add_scalar('avg_acc', engine.sate.metrics['avg_acc'],TB_ITER)
+          TB_ITER+=1
+
         ITER += 1
 
         if ITER % log_period == 0:
@@ -228,8 +236,12 @@ def do_train(
             cmc, mAP = evaluator.state.metrics['r1_mAP']
             logger.info("Validation Results - Epoch: {}".format(engine.state.epoch))
             logger.info("mAP: {:.1%}".format(mAP))
+            if tb_logger:
+              writer.add_scalar("mAP", mAP,engine.state.epoch)
             for r in [1, 5, 10]:
                 logger.info("CMC curve, Rank-{:<3}:{:.1%}".format(r, cmc[r - 1]))
+                if tb_logger:
+                  writer.add_scalar(f"CMC {r}", cmc[r-1],engine.state.epoch)
 
     trainer.run(train_loader, max_epochs=epochs)
 
