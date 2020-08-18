@@ -163,7 +163,6 @@ def do_train(
         loss_fn,
         num_query,
         start_epoch,
-        dataset
 ):
     log_period = cfg.SOLVER.LOG_PERIOD
     checkpoint_period = cfg.SOLVER.CHECKPOINT_PERIOD
