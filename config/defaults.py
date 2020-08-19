@@ -90,7 +90,7 @@ _C.SOLVER = CN()
 # Name of optimizer
 _C.SOLVER.OPTIMIZER_NAME = "Adam"
 # Number of max epoches
-_C.SOLVER.MAX_EPOCHS = 50
+_C.SOLVER.MAX_EPOCHS = 60
 # Base learning rate
 _C.SOLVER.BASE_LR = 3e-4
 # Factor of learning bias
@@ -119,7 +119,7 @@ _C.SOLVER.WEIGHT_DECAY_BIAS = 0.
 # decay rate of learning rate
 _C.SOLVER.GAMMA = 0.1
 # decay step of learning rate
-_C.SOLVER.STEPS = (30, 55)
+_C.SOLVER.STEPS = (30, 50)
 
 # warm up factor
 _C.SOLVER.WARMUP_FACTOR = 1.0 / 3
