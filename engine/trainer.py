@@ -172,11 +172,12 @@ def do_train(
     output_dir = cfg.OUTPUT_DIR
     device = cfg.MODEL.DEVICE
     epochs = cfg.SOLVER.MAX_EPOCHS
+    #tt
     tb_logger = True
 
     if tb_logger:
       writer = create_summary_writer(model,train_loader, output_dir)
-
+    #tt end
     logger = logging.getLogger("reid_baseline.train")
     logger.info("Start training")
     trainer = create_supervised_trainer(model, optimizer, loss_fn, device=device)
@@ -204,12 +205,13 @@ def do_train(
     @trainer.on(Events.ITERATION_COMPLETED)
     def log_training_loss(engine):
         global ITER
+        #tt adding tb_logger
         if tb_logger:
           global TB_ITER
           writer.add_scalar("avg_loss", engine.state.metrics['avg_loss'],TB_ITER)
           writer.add_scalar('avg_acc', engine.state.metrics['avg_acc'],TB_ITER)
           TB_ITER+=1
-
+        #tt adding tb_logger 
         ITER += 1
 
         if ITER % log_period == 0:
@@ -236,8 +238,10 @@ def do_train(
             cmc, mAP = evaluator.state.metrics['r1_mAP']
             logger.info("Validation Results - Epoch: {}".format(engine.state.epoch))
             logger.info("mAP: {:.1%}".format(mAP))
+            #tt adding tb_logger
             if tb_logger:
               writer.add_scalar("mAP", mAP,engine.state.epoch)
+            #tt end
             for r in [1, 5, 10]:
                 logger.info("CMC curve, Rank-{:<3}:{:.1%}".format(r, cmc[r - 1]))
                 if tb_logger:
@@ -265,6 +269,12 @@ def do_train_with_center(
     output_dir = cfg.OUTPUT_DIR
     device = cfg.MODEL.DEVICE
     epochs = cfg.SOLVER.MAX_EPOCHS
+    #tt
+    tb_logger = True
+
+    if tb_logger:
+      writer = create_summary_writer(model,train_loader, output_dir)
+    #tt end
 
     logger = logging.getLogger("reid_baseline.train")
     logger.info("Start training")
@@ -296,11 +306,14 @@ def do_train_with_center(
     @trainer.on(Events.ITERATION_COMPLETED)
     def log_training_loss(engine):
         global ITER
+
+        #tt adding tb_logger
         if tb_logger:
           global TB_ITER
           writer.add_scalar("avg_loss", engine.state.metrics['avg_loss'],TB_ITER)
-          writer.add_scalar("avg_acc", engine.state.metrics['avg_acc'],TB_ITER)
-          TB_ITER += 1
+          writer.add_scalar('avg_acc', engine.state.metrics['avg_acc'],TB_ITER)
+          TB_ITER+=1
+        #tt end
         ITER += 1
 
         if ITER % log_period == 0:
@@ -327,11 +340,17 @@ def do_train_with_center(
             cmc, mAP = evaluator.state.metrics['r1_mAP']
             logger.info("Validation Results - Epoch: {}".format(engine.state.epoch))
             logger.info("mAP: {:.1%}".format(mAP))
+            #tt adding tb_logger
+            if tb_logger:
+              writer.add_scalar("mAP", mAP,engine.state.epoch)
+            #tt end
             if tb_logger:
               writer.add_scalar("mAP",mAP,engine.state.epoch)
             for r in [1, 5, 10]:
                 logger.info("CMC curve, Rank-{:<3}:{:.1%}".format(r, cmc[r - 1]))
+            for top_k, kk in zip(all_topk,[1,5,10,20,50]):
                 if tb_logger:
                   writer.add_scalar(f"Top-{kk}",top_k,engine.state.epoch)
 
     trainer.run(train_loader, max_epochs=epochs)
+
