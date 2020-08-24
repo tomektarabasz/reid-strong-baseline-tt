@@ -348,9 +348,9 @@ def do_train_with_center(
               writer.add_scalar("mAP",mAP,engine.state.epoch)
             for r in [1, 5, 10]:
                 logger.info("CMC curve, Rank-{:<3}:{:.1%}".format(r, cmc[r - 1]))
-            for top_k, kk in zip(all_topk,[1,5,10,20,50]):
-                if tb_logger:
-                  writer.add_scalar(f"Top-{kk}",top_k,engine.state.epoch)
+            # for top_k, kk in zip(all_topk,[1,5,10,20,50]):
+            #     if tb_logger:
+            #       writer.add_scalar(f"Top-{kk}",top_k,engine.state.epoch)
 
     trainer.run(train_loader, max_epochs=epochs)
 
