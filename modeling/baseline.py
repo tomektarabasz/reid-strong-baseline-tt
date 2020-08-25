@@ -39,7 +39,7 @@ def weights_init_classifier(m):
 class Baseline(nn.Module):
     in_planes = 2048
 
-    def __init__(self, num_classes, last_stride, model_path, neck, neck_feat, model_name, pretrain_choice):
+    def __init__(self, num_classes, last_stride, model_path, neck, neck_feat, model_name, pretrain_choice, in_planes = 0):
         super(Baseline, self).__init__()
         if model_name == 'resnet18':
             self.in_planes = 512
@@ -139,11 +139,23 @@ class Baseline(nn.Module):
         elif model_name == 'efficientnet-b2':
           self.in_planes = 1408
           self.base = EfficientNet.from_pretrained(model_name)
-        #TT end 
+        #TT end
+
+        self.tt_linear = 512 
 
         if pretrain_choice == 'imagenet':
             self.base.load_param(model_path)
             print('Loading pretrained ImageNet model......')
+
+        #TT
+        if in_planes:
+            self.reduce_embeddings =  nn.Linear(self.in_planes, in_planes, bias=False)
+            self.in_planes = in_planes
+            self.reduce = True
+        else:
+            self.reduce = False
+
+        # TT end
 
         self.gap = nn.AdaptiveAvgPool2d(1)
         # self.gap = nn.AdaptiveMaxPool2d(1)
@@ -167,7 +179,10 @@ class Baseline(nn.Module):
 
         global_feat = self.gap(self.base(x))  # (b, 2048, 1, 1)
         global_feat = global_feat.view(global_feat.shape[0], -1)  # flatten to (bs, 2048)
-
+        #TT
+        if self.reduce: 
+            global_feat = self.reduce_embeddings(global_feat)
+        #TT end
         if self.neck == 'no':
             feat = global_feat
         elif self.neck == 'bnneck':

@@ -45,11 +45,28 @@ def make_loss(cfg, num_classes):    # modified by gu
 
 
 def make_loss_with_center(cfg, num_classes):    # modified by gu
+    #TT
+    # if cfg.MODEL.NAME == 'resnet18' or cfg.MODEL.NAME == 'resnet34':
+    #     feat_dim = 512
+    # else:
+    #     feat_dim = 2048
     if cfg.MODEL.NAME == 'resnet18' or cfg.MODEL.NAME == 'resnet34':
         feat_dim = 512
+    elif cfg.MODEL.NAME == 'efficientnet-b0':
+        feat_dim = 1280
+    elif cfg.MODEL.NAME == 'efficientnet-b1':
+        feat_dim = 1280
+    elif cfg.MODEL.NAME == 'efficientnet-b2':
+        feat_dim = 1408
+    elif cfg.MODEL.NAME == 'efficientnet-b3':
+        feat_dim = 1536
+    elif cfg.MODEL.NAME == 'efficientnet-b4':
+        feat_dim = 1792
     else:
         feat_dim = 2048
-
+    if cfg.MODEL.EMBEDING_SIZE:
+        feat_dim = cfg.MODEL.EMBEDING_SIZE
+    #TT end
     if cfg.MODEL.METRIC_LOSS_TYPE == 'center':
         center_criterion = CenterLoss(num_classes=num_classes, feat_dim=feat_dim, use_gpu=True)  # center loss
 

@@ -43,6 +43,9 @@ _C.MODEL.METRIC_LOSS_TYPE = 'triplet'
 # If train with label smooth, options: 'on', 'off'
 _C.MODEL.IF_LABELSMOOTH = 'on'
 
+# tt
+_C.MODEL.EMBEDING_SIZE = 0
+# tt end
 
 # -----------------------------------------------------------------------------
 # INPUT

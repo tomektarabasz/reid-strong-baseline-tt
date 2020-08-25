@@ -30,7 +30,7 @@ def euclidean_dist(x, y):
     xx = torch.pow(x, 2).sum(1, keepdim=True).expand(m, n)
     yy = torch.pow(y, 2).sum(1, keepdim=True).expand(n, m).t()
     dist = xx + yy
-    dist.addmm_(1, -2, x, y.t())
+    dist.addmm_(1, -2, x.float(), y.float().t())
     dist = dist.clamp(min=1e-12).sqrt()  # for numerical stability
     return dist
 
