@@ -9,12 +9,13 @@ import logging
 import torch
 import torch.nn as nn
 from ignite.engine import Engine, Events
-from ignite.handlers import ModelCheckpoint, Timer
+from ignite.handlers import Timer
 from ignite.metrics import RunningAverage
 import os
 from torch.utils.tensorboard import SummaryWriter
 
 from utils.reid_metric import R1_mAP
+from checkpointer_class import ModelCheckpoint
 
 global ITER
 ITER = 0
@@ -56,6 +57,11 @@ def create_supervised_trainer(model, optimizer, loss_fn,
     Returns:
         Engine: a trainer engine with supervised update function
     """
+    #tt
+    use_mixed_precision = True 
+    scaler = GradScaler(enabled=use_mixed_precision)
+    #end
+
     if device:
         if torch.cuda.device_count() > 1:
             model = nn.DataParallel(model)
@@ -67,10 +73,19 @@ def create_supervised_trainer(model, optimizer, loss_fn,
         img, target = batch
         img = img.to(device) if torch.cuda.device_count() >= 1 else img
         target = target.to(device) if torch.cuda.device_count() >= 1 else target
-        score, feat = model(img)
-        loss = loss_fn(score, feat, target)
-        loss.backward()
-        optimizer.step()
+        #tt
+        # score, feat = model(img)
+        # loss = loss_fn(score, feat, target)
+        # loss.backward()
+        # optimizer.step()
+        with autocast(enabled=use_mixed_precision):
+            score, feat = model(img)
+            loss = loss_fn(score, feat, target)
+
+        scaler.scale(loss).backward()
+        scaler.step(optimizer)
+        scaler.update()
+        #tt
         # compute acc
         acc = (score.max(1)[1] == target).float().mean()
         return loss.item(), acc.item()
@@ -93,6 +108,11 @@ def create_supervised_trainer_with_center(model, center_criterion, optimizer, op
     Returns:
         Engine: a trainer engine with supervised update function
     """
+    #tt
+    use_mixed_precision = True 
+    scaler = GradScaler(enabled=use_mixed_precision)
+    #end
+
     if device:
         if torch.cuda.device_count() > 1:
             model = nn.DataParallel(model)
@@ -105,15 +125,27 @@ def create_supervised_trainer_with_center(model, center_criterion, optimizer, op
         img, target = batch
         img = img.to(device) if torch.cuda.device_count() >= 1 else img
         target = target.to(device) if torch.cuda.device_count() >= 1 else target
-        score, feat = model(img)
-        loss = loss_fn(score, feat, target)
-        # print("Total loss is {}, center loss is {}".format(loss, center_criterion(feat, target)))
-        loss.backward()
-        optimizer.step()
+        #tt
+        # score, feat = model(img)
+        # loss = loss_fn(score, feat, target)
+        # # print("Total loss is {}, center loss is {}".format(loss, center_criterion(feat, target)))
+        # loss.backward()
+        # optimizer.step()
+        with autocast(enabled=use_mixed_precision):
+            score, feat = model(img)
+            loss = loss_fn(score, feat, target)
+
+        scaler.scale(loss).backward()
+        
+        #end tt
         for param in center_criterion.parameters():
             param.grad.data *= (1. / cetner_loss_weight)
-        optimizer_center.step()
-
+        #tt
+        # optimizer_center.step()
+        scaler.step(optimizer)
+        scaler.step(optimizer_center)
+        scaler.update()
+        #tt end
         # compute acc
         acc = (score.max(1)[1] == target).float().mean()
         return loss.item(), acc.item()
