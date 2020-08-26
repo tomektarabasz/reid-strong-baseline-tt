@@ -15,7 +15,8 @@ import os
 from torch.utils.tensorboard import SummaryWriter
 
 from utils.reid_metric import R1_mAP
-from checkpointer_class import ModelCheckpoint
+from .checkpointer_class import ModelCheckpoint
+from torch.cuda.amp import autocast, GradScaler
 
 global ITER
 ITER = 0
