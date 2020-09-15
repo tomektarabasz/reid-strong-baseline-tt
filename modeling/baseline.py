@@ -142,6 +142,10 @@ class Baseline(nn.Module):
         elif model_name == 'efficientnet-b7':
           self.in_planes = 2560
           self.base = EfficientNet.from_pretrained(model_name)
+        elif model_name == 'resnet50_swish':
+            self.base = ResNet(last_stride=last_stride,
+                               block=Bottleneck,
+                               layers=[3, 4, 6, 3])
         #TT end
 
         self.tt_linear = 512 
