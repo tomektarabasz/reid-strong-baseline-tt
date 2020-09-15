@@ -309,10 +309,13 @@ class EfficientNet(nn.Module):
         x = self.extract_features(inputs)
 
         # Pooling and final linear layer
-        x = self._avg_pooling(x)
-        x = x.flatten(start_dim=1)
-        x = self._dropout(x)
-        x = self._fc(x)
+        
+        # tt
+        # x = self._avg_pooling(x)
+        # x = x.flatten(start_dim=1)
+        # x = self._dropout(x)
+        # x = self._fc(x)
+        # end tt 
 
         return x
 
