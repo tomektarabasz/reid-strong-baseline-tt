@@ -140,7 +140,7 @@ class Baseline(nn.Module):
           self.in_planes = 1408
           self.base = EfficientNet.from_pretrained(model_name)
         elif model_name == 'efficientnet-b7':
-          self.in_planes = 1408
+          self.in_planes = 2560
           self.base = EfficientNet.from_pretrained(model_name)
         #TT end
 
