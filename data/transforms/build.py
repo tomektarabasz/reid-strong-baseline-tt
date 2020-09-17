@@ -6,7 +6,7 @@
 
 import torchvision.transforms as T
 
-from .transforms import RandomErasing
+from .transforms import RandomErasing, AddingNoise
 
 
 def build_transforms(cfg, is_train=True):
@@ -19,6 +19,7 @@ def build_transforms(cfg, is_train=True):
             T.RandomCrop(cfg.INPUT.SIZE_TRAIN),
             T.ToTensor(),
             normalize_transform,
+            AddingNoise(),
             RandomErasing(probability=cfg.INPUT.RE_PROB, mean=cfg.INPUT.PIXEL_MEAN)
         ])
     else:

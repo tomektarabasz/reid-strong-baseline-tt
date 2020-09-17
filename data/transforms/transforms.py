@@ -6,6 +6,7 @@
 
 import math
 import random
+import torch
 
 
 class RandomErasing(object):
@@ -53,3 +54,19 @@ class RandomErasing(object):
                 return img
 
         return img
+#tt
+class AddingNoise(object):
+
+    def __init__(self,probability=0.3, level=0.01):
+        self.level = level
+        self.probability = probability
+
+    def __call__(self, img_tensor):
+      if random.uniform(0, 1) >= self.probability:
+            return img_tensor
+      delta = torch.rand(img_tensor.shape)
+      delta.data.clamp_(-self.level, self.level)
+
+      img_tensor = img_tensor + delta
+      return img_tensor
+# tt end
